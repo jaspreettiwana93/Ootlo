@@ -9,16 +9,36 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, LGSideMenuDelegate {
 
+    var sideMenuController: LGSideMenuController!
+    var sideMenu: SideMenuVC!
+    var navBar: UINavigationController!
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        sideMenu = storyBoard.instantiateViewController(withIdentifier: "SideMenuVC") as! SideMenuVC
+        
+        navBar = UINavigationController()
+        
+        let mainVC = storyBoard.instantiateViewController(withIdentifier: "HomeVC") as! HomeVC
+        navBar.setViewControllers([mainVC], animated: true)
+        
+        //        UIView.appearance().semanticContentAttribute = .forceRightToLeft
+        sideMenuController = LGSideMenuController(rootViewController: navBar, leftViewController: sideMenu, rightViewController: nil)
+        sideMenuController.delegate = self
+        window?.rootViewController = sideMenuController
+        
         return true
     }
 
+    func willShowLeftView(_ leftView: UIView, sideMenuController: LGSideMenuController)
+    {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue:"left_view_show"), object: nil, userInfo: nil)
+    }
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
